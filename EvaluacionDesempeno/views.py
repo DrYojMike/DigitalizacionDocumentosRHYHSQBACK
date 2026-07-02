@@ -1,88 +1,114 @@
-from rest_framework.decorators import api_view
+from EvaluacionDesempeno.services.AutoEvaluacion_Empleado_Service import AutoEvaluacionService
+from EvaluacionDesempeno.services.Evaluar_Empleado_Jefe_Service import EvaluarEmpleadoService
+from users.authentication.custom import CustomJWTAuthentication, IsCustomAuthenticated
+
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db import connection
-from urllib.parse import quote
-from django.http import FileResponse, Http404
-import os
-import mimetypes
+from rest_framework import status
 
-# Create your views here.
 
-@api_view(['GET'])
-def FormatoEvaluacion(request, tipo):
-
-    if not tipo:
-        return Response({
-            "message": "Error: Se requiere el Parametro tipo",
-            "data": []
-        })
-
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT 
-                    A.IdEvaArea,
-                    A.NomEvaArea,
-                    C.IdEvaCompetencia,
-                    C.NomEvaCompetencia,
-                    C.DesEvaCompetencia,
-                    IG.IdEvaIndicadorGestion,
-                    IG.NomEvaIndicadorGestion
-                FROM [Biometrico].[dbo].[TbEvaluacionArea] A
-                INNER JOIN [Biometrico].[dbo].[TbEvaluacionCompetencia] C ON C.IdAreaCompetencia = A.IdEvaArea 
-                    AND C.ForEvaCompetencia IN (0, %s)
-                INNER JOIN [Biometrico].[dbo].[TbEvaluacionIndicadorGestion] IG ON IG.IdCompetenciaIndicadorGestion = C.IdEvaCompetencia 
-                    AND ForEvaIndicadorGestion IN (0, %s)
-                ORDER BY A.IdEvaArea, C.IdEvaCompetencia
-            """, [tipo, tipo])
-
-            rows = cursor.fetchall()
-
-        data = {}
-
-        for row in rows:
-            area_id = row[0]
-            area_name = row[1]
-            comp_id = row[2]
-            comp_name = row[3]
-            comp_desc = row[4]
-            ind_id = row[5]
-            ind_name = row[6]
-
-            # AREA
-            if area_id not in data:
-                data[area_id] = {
-                    "area": area_name,
-                    "competencias": {}
-                }
-
-            # COMPETENCIA
-            if comp_id not in data[area_id]["competencias"]:
-                data[area_id]["competencias"][comp_id] = {
-                    "nombre": comp_name,
-                    "descripcion": comp_desc,
-                    "indicadores": []
-                }
-
-            # INDICADOR
-            data[area_id]["competencias"][comp_id]["indicadores"].append({
-                "id": ind_id,
-                "nombre": ind_name
+class FormatoEvaluacionView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
+    def get(self, request, tipo):
+        if not tipo:
+            return Response({
+                "message":"Se requiere parametro tipo",
+                "data":[]
+            })
+        try:
+            data = AutoEvaluacionService.get_evaluation_format(tipo)
+            return Response({
+                "message":"OK",
+                "data":data
+            })
+        except Exception as e:
+            return Response({
+                "message":str(e),
+                "data":[]
             })
 
-        # convertir a lista final
-        result = []
-        for area in data.values():
-            area["competencias"] = list(area["competencias"].values())
-            result.append(area)
 
+class CreateEvaluationView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
+    def post(self,request):
+        result = AutoEvaluacionService.create_evaluation(request.data)
+        if "error" in result:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            result,
+            status=status.HTTP_201_CREATED
+        )
+
+
+class ListaEmpleadoEvaluacionView(APIView): 
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
+    def get(self, request, jefe):
+        empleados = EvaluarEmpleadoService.execute(jefe)
         return Response({
-            "message": "OK",
-            "data": result
+            "message":"OK",
+            "data":empleados
         })
 
-    except Exception as e:
+
+class EvaluacionEmpleado(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
+    def get(self, request, idUsuario):
+        if not idUsuario:
+            return Response({
+                "message":
+                "Se requiere parametro usuario",
+
+                "data":[]
+            })
+        
+        try:
+            data = EvaluarEmpleadoService.get_autoevaluacion_empleado(idUsuario)
+            return Response({
+                "message":"OK",
+                "data":data
+            })
+        except Exception as e:
+            return Response({
+                "message":str(e),
+                "data":[]
+            })
+ 
+ 
+class EvaluarEmpleadoView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
+    def post(self, request):
+        resultado = EvaluarEmpleadoService.evaluar_empleado(
+            request.data
+        )
+        return Response(
+            resultado,
+            status=status.HTTP_201_CREATED
+        )            
+      
+        
+class EvaluacionCompletaView(APIView): 
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
+    def get(self, request, idEvaluacion):
+        evaluacion = AutoEvaluacionService.get_evaluation_info(idEvaluacion)
         return Response({
-            "message": f"Error: {str(e)}",
-            "data": []
+            "message":"OK",
+            "data":evaluacion
+        })
+
+
+class MyListEvaluationsView(APIView): 
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
+    def get(self, request, idUsuario):
+        evaluaciones = AutoEvaluacionService.list_evaluations(idUsuario)
+        return Response({
+            "message":"OK",
+            "data":evaluaciones
         })
