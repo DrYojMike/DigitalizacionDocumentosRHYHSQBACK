@@ -18,6 +18,7 @@ class EvaluacionEmpleadoJefeRepository:
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT
+                    ROW_NUMBER() OVER (ORDER BY U.Userid) AS Contador,
                     ISNULL(EG.IdEvaGeneral,0) AS idEvaGeneral,
                     U.Userid,
                     U.UserCode AS CEDULA,

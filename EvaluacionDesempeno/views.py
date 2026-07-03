@@ -43,9 +43,7 @@ class CreateEvaluationView(APIView):
         )
 
 
-class ListaEmpleadoEvaluacionView(APIView): 
-    authentication_classes = [CustomJWTAuthentication]
-    permission_classes = [IsCustomAuthenticated]
+class ListaEmpleadoEvaluacionView(APIView):
     def get(self, request, jefe):
         empleados = EvaluarEmpleadoService.execute(jefe)
         return Response({
