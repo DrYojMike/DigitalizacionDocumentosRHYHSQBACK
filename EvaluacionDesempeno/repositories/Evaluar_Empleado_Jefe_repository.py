@@ -18,7 +18,7 @@ class EvaluacionEmpleadoJefeRepository:
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT
-                    EG.IdEvaGeneral AS idEvaGeneral,
+                    ISNULL(EG.IdEvaGeneral,0) AS idEvaGeneral,
                     U.Userid,
                     U.UserCode AS CEDULA,
                     U.Name AS NAME,

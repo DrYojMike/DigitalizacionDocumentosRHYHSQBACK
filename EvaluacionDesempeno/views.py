@@ -60,9 +60,7 @@ class EvaluacionEmpleado(APIView):
     def get(self, request, idUsuario):
         if not idUsuario:
             return Response({
-                "message":
-                "Se requiere parametro usuario",
-
+                "message":"Se requiere parametro usuario",
                 "data":[]
             })
         
