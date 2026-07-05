@@ -53,8 +53,7 @@ class AutoEvaluacionService:
         # validar año
         if AutoEvaluacionEmpleadoReposity.has_evaluation_this_year(documento):
             return {
-                "error":
-                "Ya realizó la evaluación de este año"
+                "message":"Ya realizó la evaluación de este año"
             }
         # crear cabecera
         id_general = (
@@ -71,21 +70,17 @@ class AutoEvaluacionService:
             )
         
         info = EvaluationEmailInfoRepository.get_employee_and_manager(documento)
-        print("===== ANTES DE ENVIAR CORREO =====")
         if info:
             try:
                 EvaluationEmailService.notify_AutoEvaluation(
                     employee_name=info["employee_name"],
                     employee_email=info["employee_email"]
                 )
-                print("===== DESPUÉS DE ENVIAR CORREO =====")
             except Exception as e:
                 logger.exception(e)
         return {
-            "message":
-            "Evaluación creada correctamente",
-            "id":
-            id_general
+            "message":"Evaluación creada correctamente",
+            "id":id_general
         }
     
     

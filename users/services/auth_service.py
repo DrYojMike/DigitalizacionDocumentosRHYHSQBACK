@@ -27,4 +27,4 @@ class AuthServices:
 
                 return EmployeeService.build_profile(empleado)
 
-        raise ValueError("Credenciales inválidas")
+        raise ValueError({"message": "Credenciales inválidas"})

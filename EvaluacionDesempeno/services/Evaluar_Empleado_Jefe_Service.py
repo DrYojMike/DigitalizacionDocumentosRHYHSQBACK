@@ -103,9 +103,7 @@ class EvaluarEmpleadoService:
                     idJefe=idJefe,
                     compromiso=compromiso
                 )
-        print("===== ANTES DE OBTENER INFO =====")
         info = EvaluationEmailInfoRepository.get_employee_and_manager(respuestas[0]["idEmp"])
-        print("===== ANTES DE ENVIAR CORREO =====")
         if info:
             try:
                 EvaluationEmailService.notify_employee(
@@ -113,7 +111,6 @@ class EvaluarEmpleadoService:
                     employee_email=info["employee_email"],
                     manager_name=info["manager_name"]
                 )
-                print("===== DESPUÉS DE ENVIAR CORREO =====")
             except Exception as e:
                 logger.exception(e)
         return {
