@@ -31,7 +31,7 @@ class AutoEvaluacionEmpleadoReposity:
                 # No encontró al empleado o no cumple los requisitos
                 return False
 
-            return row[2] == 0
+            return row[2] == 1
     
     
     @staticmethod
