@@ -39,8 +39,11 @@ class CreateEvaluationView(APIView):
     def post(self,request):
         try:
             result = AutoEvaluacionService.create_evaluation(request.data)
-            if "message" in result:
-                return Response(result, status=status.HTTP_400_BAD_REQUEST)
+            if "creado" in result:
+                return Response({
+                    "message":"No puede volver a realizar la evaluacion.",
+                    "status":status.HTTP_400_BAD_REQUEST
+                })
 
             return Response(
                 result,

@@ -2,27 +2,36 @@ from django.db import connection
 class AutoEvaluacionEmpleadoReposity:
     
     @staticmethod
-    def has_evaluation_this_year(documento):
+    def has_evaluation_this_year(idUsuario):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT TOP 1 1
-                FROM [Biometrico].[dbo].[Userinfo] U
-                LEFT JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] AUE
-                    ON AUE.IdAutEvaEmpleado = U.UserId
-                LEFT JOIN [Biometrico].[dbo].[TbEvaluacionGeneral] EG
-                    ON EG.IdEvaGeneral = AUE.IdEvaGen
-                WHERE U.UserCode = %s
-                AND U.FechaRetiro IS NULL
-                AND DATEDIFF(MONTH, U.EmployDate, GETDATE()) >= 6
-                AND U.Mercico = 1
-                AND U.IdCargo <> 31
-                AND (
-                        EG.FecEvaGeneral IS NULL
-                        OR YEAR(EG.FecEvaGeneral) <> YEAR(GETDATE())
-                )
-            """, [documento])
+                    SELECT TOP 1
+                        EG.IdEvaGeneral,
+                        EG.FecEvaGeneral,
+                        CASE
+                            WHEN EG.FecEvaGeneral IS NULL THEN 1
+                            WHEN GETDATE() >= DATEADD(YEAR, 1, EG.FecEvaGeneral) THEN 1
+                            ELSE 0
+                        END AS DebeEvaluarse
+                    FROM [Biometrico].[dbo].[Userinfo] U
+                    LEFT JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] AUE
+                        ON AUE.IdAutEvaEmpleado = U.UserId
+                    LEFT JOIN [Biometrico].[dbo].[TbEvaluacionGeneral] EG
+                        ON EG.IdEvaGeneral = AUE.IdEvaGen
+                    WHERE U.Userid = %s
+                        AND U.FechaRetiro IS NULL
+                        AND DATEDIFF(MONTH, U.EmployDate, GETDATE()) >= 6
+                        AND U.Mercico = 1
+                        AND U.IdCargo <> 31
+                    ORDER BY EG.FecEvaGeneral DESC;
+            """, [idUsuario])
+            row = cursor.fetchone()
 
-            return cursor.fetchone() is not None
+            if row is None:
+                # No encontró al empleado o no cumple los requisitos
+                return False
+
+            return row[2] == 0
     
     
     @staticmethod

@@ -48,12 +48,12 @@ class AutoEvaluacionService:
     
     @staticmethod
     def create_evaluation(data):
-        documento = data["idUsuario"]
-        print(documento)
+        idUsuario = data["idUsuario"]
+        print(idUsuario)
         # validar año
-        if AutoEvaluacionEmpleadoReposity.has_evaluation_this_year(documento):
+        if AutoEvaluacionEmpleadoReposity.has_evaluation_this_year(idUsuario):
             return {
-                "message":"Ya realizó la evaluación de este año"
+                "creado":"Ya realizó la evaluación de este año"
             }
         # crear cabecera
         id_general = (
@@ -68,8 +68,7 @@ class AutoEvaluacionService:
                 empleado=empleado,
                 indicador=item["indicador_id"]
             )
-        
-        info = EvaluationEmailInfoRepository.get_employee_and_manager(documento)
+        info = EvaluationEmailInfoRepository.get_employee_and_manager(idUsuario)
         if info:
             try:
                 EvaluationEmailService.notify_AutoEvaluation(
