@@ -26,7 +26,7 @@ class EmployeeService:
                 "evaluacion":
                     AutoEvaluacionEmpleadoReposity
                     .has_evaluation_this_year(
-                        empleado.documentoEmpleado
+                        empleado.idEmpleado
                     ),
 
                 "empleadosCargo":
