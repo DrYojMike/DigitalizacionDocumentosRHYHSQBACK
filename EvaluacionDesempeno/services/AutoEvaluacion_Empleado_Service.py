@@ -51,7 +51,8 @@ class AutoEvaluacionService:
         idUsuario = data["idUsuario"]
         print(idUsuario)
         # validar año
-        if AutoEvaluacionEmpleadoReposity.has_evaluation_this_year(idUsuario):
+        print(AutoEvaluacionEmpleadoReposity.has_evaluation_this_year(idUsuario))
+        if not AutoEvaluacionEmpleadoReposity.has_evaluation_this_year(idUsuario):
             return {
                 "creado":"Ya realizó la evaluación de este año"
             }

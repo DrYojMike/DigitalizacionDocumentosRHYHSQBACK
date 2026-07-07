@@ -1,7 +1,7 @@
 from EvaluacionDesempeno.services.AutoEvaluacion_Empleado_Service import AutoEvaluacionService
 from EvaluacionDesempeno.services.Evaluar_Empleado_Jefe_Service import EvaluarEmpleadoService
 from users.authentication.custom import CustomJWTAuthentication, IsCustomAuthenticated
-
+from EvaluacionDesempeno.services.AdminEvaluation_service import EvaluationAdminService
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -39,6 +39,7 @@ class CreateEvaluationView(APIView):
     def post(self,request):
         try:
             result = AutoEvaluacionService.create_evaluation(request.data)
+            print(result)
             if "creado" in result:
                 return Response({
                     "message":"No puede volver a realizar la evaluacion.",
@@ -154,6 +155,28 @@ class MyListEvaluationsView(APIView):
                 "message":"Listado de evaluaciones Obtenidas de manera correcta",
                 "status": status.HTTP_200_OK,
                 "data":evaluaciones
+            })
+        except Exception as e:
+            print(str(e))
+            return Response({
+                "message":"Ha ocurrido un error interno. Por favor, informe al soporte técnico.",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "data":[]
+            })
+
+
+class EvaluacionIndicadorGestion(APIView):
+    # authentication_classes = [CustomJWTAuthentication]
+    # permission_classes = [IsCustomAuthenticated]
+    
+    def get(self, request):
+        try:
+            indicadorGestion = EvaluationAdminService.getIndicadorIndGestion()
+            inidcadorCompotencia = EvaluationAdminService.getIndicadorCompetencia()
+            return Response({
+                "message": "Se han obtendido los indicadores de manera correcta.",
+                "data":{"indicadorGestion":indicadorGestion,
+                        "indicadorCompetencia": inidcadorCompotencia},
             })
         except Exception as e:
             print(str(e))
