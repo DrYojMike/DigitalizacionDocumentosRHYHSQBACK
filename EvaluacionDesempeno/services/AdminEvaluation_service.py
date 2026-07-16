@@ -24,21 +24,20 @@ class EvaluationAdminService:
                     "indicador": row[2],
                     "cantEvaluaciones": row[3],
                     "notMaxima": row[4],
-                    "notIndicador": row[5],
+                    "notMaxEvaluacion": row[5],
                     "promedio":row[6]
                 }
             else:
                 indicadores[idIndicador]["cantEvaluaciones"] += row[3]
                 indicadores[idIndicador]["notMaxima"] += row[4]
-                indicadores[idIndicador]["notIndicador"] += row[5]
-                indicadores[idIndicador]["promedio"] += row[5]
+                indicadores[idIndicador]["notMaxEvaluacion"] += row[5]
 
         data = []
 
         for anio in resultado.values():
             for indicador in anio["indicadores"].values():
                 indicador["promedio"] = (
-                    100 * indicador["notIndicador"] / indicador["notMaxima"] 
+                    100 * indicador["notMaxEvaluacion"] / indicador["notMaxima"] 
                     if indicador["notMaxima"] > 0 else 0
                 )
 
@@ -47,6 +46,7 @@ class EvaluationAdminService:
 
         return data
     
+    @staticmethod
     def getIndicadorCompetencia():
         comeptencia = EvaluationAdminRepository.indicadorCompetencia()
         
@@ -71,19 +71,19 @@ class EvaluationAdminService:
                     "descripcion":row[3],
                     "cantEvaluaciones":row[4],
                     "notMaxima":row[5],
-                    "notCompetencia":row[6],
+                    "notMaxEvaluacion":row[6],
                     "promedio":row[7]
                 }
             else:
                 competencias[idCompetencia]["cantEvaluaciones"]+=row[4]
                 competencias[idCompetencia]["notMaxima"]+=row[5]
-                competencias[idCompetencia]["notCompetencia"]+=row[6]
+                competencias[idCompetencia]["notMaxEvaluacion"]+=row[6]
             
         data = []
         for anio in resultado.values():
             for competencias in anio["competencias"].values():
                 competencias["promedio"] = (
-                    100 * competencias["notCompetencia"] / competencias["notMaxima"]
+                    100 * competencias["notMaxEvaluacion"] / competencias["notMaxima"]
                     if competencias["notMaxima"] > 0 else 0
                 )
 
@@ -92,4 +92,45 @@ class EvaluationAdminService:
         
         return data
 
-    
+    @staticmethod
+    def getindicadorArea():
+        areas  =  EvaluationAdminRepository.indicadorArea()
+        if not areas:
+            return None
+        resultado = {}
+        for row in areas:
+            anio = row[0]
+            if not anio in resultado:
+                resultado[anio]={
+                    "anio": anio,
+                    "areas":{}
+                }
+            
+            idArea = row[1]
+            areas = resultado[anio]["areas"]
+            if not idArea in areas:
+                areas[idArea]={
+                    "id": idArea,
+                    "Area":row[2],
+                    "cantEvaluaciones":row[3],
+                    "notMaxima":row[4],
+                    "notMaxEvaluacion":row[5],
+                    "promedio":row[6]
+                }
+            else:
+                areas[idArea]["cantEvaluaciones"] += row[3]
+                areas[idArea]["notMaxima"] += row[4]
+                areas[idArea]["notMaxEvaluacion"] += row[5]
+        
+        data = []
+        for anio in resultado.values():
+            for areas in anio["areas"].values():
+                areas["promedio"] = (
+                    100 * areas["notMaxEvaluacion"] / areas["notMaxima"]
+                    if areas["notMaxima"] > 0 else 0
+                )
+
+            anio["areas"] = list(anio["areas"].values())
+            data.append(anio)
+        
+        return data

@@ -42,13 +42,14 @@ class CreateEvaluationView(APIView):
             print(result)
             if "creado" in result:
                 return Response({
-                    "message":"No puede volver a realizar la evaluacion.",
+                    "message":"No puede realizar la evaluacion.",
                     "status":status.HTTP_400_BAD_REQUEST
                 })
 
-            return Response(
-                result,
-                status=status.HTTP_201_CREATED
+            return Response({
+                    "message":"Evaluación creada correctamente",
+                    "status":status.HTTP_201_CREATED
+                }
             )
         except Exception as e:
             print(str(e))
@@ -166,17 +167,23 @@ class MyListEvaluationsView(APIView):
 
 
 class EvaluacionIndicadorGestion(APIView):
-    # authentication_classes = [CustomJWTAuthentication]
-    # permission_classes = [IsCustomAuthenticated]
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomAuthenticated]
     
     def get(self, request):
         try:
             indicadorGestion = EvaluationAdminService.getIndicadorIndGestion()
             inidcadorCompotencia = EvaluationAdminService.getIndicadorCompetencia()
+            indicadorAreas = EvaluationAdminService.getindicadorArea()
+            print( indicadorGestion,inidcadorCompotencia,indicadorAreas)
             return Response({
                 "message": "Se han obtendido los indicadores de manera correcta.",
-                "data":{"indicadorGestion":indicadorGestion,
-                        "indicadorCompetencia": inidcadorCompotencia},
+                "status": status.HTTP_200_OK,
+                "data":{
+                    "indicadorGestion":indicadorGestion,
+                    "indicadorCompetencia": inidcadorCompotencia,
+                    "indicadorAreas": indicadorAreas
+                }
             })
         except Exception as e:
             print(str(e))

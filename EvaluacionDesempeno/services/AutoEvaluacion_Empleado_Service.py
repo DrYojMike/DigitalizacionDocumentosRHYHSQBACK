@@ -79,7 +79,6 @@ class AutoEvaluacionService:
             except Exception as e:
                 logger.exception(e)
         return {
-            "message":"Evaluación creada correctamente",
             "id":id_general
         }
     

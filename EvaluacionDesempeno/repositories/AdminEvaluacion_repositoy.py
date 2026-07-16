@@ -52,7 +52,6 @@ class EvaluationAdminRepository():
                     ECOMP.DesEvaCompetencia
                 ORDER BY ECOMP.IdEvaCompetencia ASC
             """)
-            print(cursor.fetchall())
             return cursor.fetchall()
     
     
