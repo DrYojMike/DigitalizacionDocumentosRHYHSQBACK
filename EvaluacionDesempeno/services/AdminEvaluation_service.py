@@ -152,7 +152,8 @@ class EvaluationAdminService:
                 "documentoEmpleado": row[4],
                 "nombreJefe": row[5],
                 "documentoJefe": row[6],
-                "socializado": row[7]
+                "socializado": row[7],
+                "SocializadoPor": row[8],
             })
         
         return resultado
@@ -163,7 +164,5 @@ class EvaluationAdminService:
         if not estatdisticas:
             return {}
         
-        row = estatdisticas[0]
-        return{
-            
-        }
+        resultado = {}
+    

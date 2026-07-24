@@ -93,7 +93,8 @@ class EvaluationAdminRepository():
                         U.UserCode,
                         UJEF.Name,
                         UJEF.UserCode,
-                        S.IdSoci
+                        S.IdSoci,
+                        SOCI.Name
                     FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
                     LEFT JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
                     LEFT JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF
@@ -102,7 +103,8 @@ class EvaluationAdminRepository():
                     LEFT JOIN [Biometrico].[dbo].[Userinfo] U ON U.UserId = EMP.IdAutEvaEmpleado
                     LEFT JOIN [Biometrico].[dbo].[Userinfo] UJEF ON UJEF.UserId = JEF.IdEvaEmpJefe 
                     LEFT JOIN [Biometrico].[dbo].[TbSocializacionEvDesempeno] S ON S.IdEvaGenSoci = EVG.IdEvaGeneral
-                    WHERE U.UserCode = '52159369'
+                    LEFT JOIN [Biometrico].[dbo].[Userinfo] SOCI ON SOCI.UserId =  S.IdSocializador
+                    WHERE U.UserCode = %s
                     GROUP BY
                         EVG.IdEvaGeneral,
                         EVG.FecEvaGeneral,
@@ -111,7 +113,8 @@ class EvaluationAdminRepository():
                         U.UserCode,
                         UJEF.Name,
                         UJEF.UserCode,
-                        S.IdSoci
+                        S.IdSoci,
+                        SOCI.Name
                 """,[userDocumento])
             return cursor.fetchall()
     
@@ -122,6 +125,7 @@ class EvaluationAdminRepository():
             cursor.execute(
                 """
                     SELECT
+                        EVG.IdEvaGeneral,
                         EVG.FecEvaGeneral,
                         EMP.IdAutEvaEmpleado,
                         U.Name,
@@ -139,6 +143,7 @@ class EvaluationAdminRepository():
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (51,52,53,54,55,56,57,115,116,117,119) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS HSEQ,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (60,61,62,63,64,109,110,111,112,113,114) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS GestionHumana,
                         S.IdSoci,
+                        SOCI.Name,
                         S.ComproSoci
                     FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
                     INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
@@ -148,7 +153,8 @@ class EvaluationAdminRepository():
                     INNER JOIN [Biometrico].[dbo].[Userinfo] U ON U.UserId = EMP.IdAutEvaEmpleado
                     INNER JOIN [Biometrico].[dbo].[Userinfo] UJEF ON UJEF.UserId = JEF.IdEvaEmpJefe
                     LEFT JOIN [Biometrico].[dbo].[TbSocializacionEvDesempeno] S ON S.IdEvaGenSoci = EVG.IdEvaGeneral
-                    WHERE EVG.IdEvaGeneral = 23
+                    LEFT JOIN [Biometrico].[dbo].[Userinfo] SOCI ON SOCI.UserId =  S.IdSocializador
+                    WHERE EVG.IdEvaGeneral = %s
                     GROUP BY
                         EVG.IdEvaGeneral,
                         EVG.FecEvaGeneral,
@@ -158,6 +164,7 @@ class EvaluationAdminRepository():
                         UJEF.Name,
                         UJEF.UserCode,
                         S.IdSoci,
+                        SOCI.Name,
                         S.ComproSoci
                 """[idEvaluacion]) 
             return cursor.fetchall()
