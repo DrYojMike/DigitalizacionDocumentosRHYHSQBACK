@@ -175,7 +175,6 @@ class EvaluacionIndicadorGestion(APIView):
             indicadorGestion = EvaluationAdminService.getIndicadorIndGestion()
             inidcadorCompotencia = EvaluationAdminService.getIndicadorCompetencia()
             indicadorAreas = EvaluationAdminService.getindicadorArea()
-            print( indicadorGestion,inidcadorCompotencia,indicadorAreas)
             return Response({
                 "message": "Se han obtendido los indicadores de manera correcta.",
                 "status": status.HTTP_200_OK,
@@ -192,3 +191,22 @@ class EvaluacionIndicadorGestion(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "data":[]
             })
+
+
+class EvaluacionSocializacion(APIView):
+    def get(self, reques, userDocumento):
+        try:
+            evaluaciones = EvaluationAdminService.getListEvaluationEmpleye(userDocumento)
+            return Response({
+                "message": "Evaluaciones obtenidas de manera correcta.",
+                "status": status.HTTP_200_OK,
+                "data":evaluaciones
+            })
+        except Exception as e:
+                    print(str(e))
+                    return Response({
+                        "message":"Ha ocurrido un error interno. Por favor, informe al soporte técnico.",
+                        "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        "data":[]
+                    })
+        

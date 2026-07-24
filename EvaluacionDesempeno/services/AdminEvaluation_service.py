@@ -134,3 +134,36 @@ class EvaluationAdminService:
             data.append(anio)
         
         return data
+
+    @staticmethod
+    def getListEvaluationEmpleye(userDocumento):
+        evaluaciones = EvaluationAdminRepository.EvaluationEmployeList(userDocumento)
+        if not evaluaciones:
+            return []
+        
+        resultado = []
+        
+        for row in evaluaciones:
+            resultado.append({
+                "idEvaluacion": row[0],
+                "fechaEvaluacion": row[1],
+                "idEmpleado": row[2],
+                "nombreEmpleado": row[3],
+                "documentoEmpleado": row[4],
+                "nombreJefe": row[5],
+                "documentoJefe": row[6],
+                "socializado": row[7]
+            })
+        
+        return resultado
+    
+    @staticmethod
+    def getSocializacionEvaluacion(idEvaluacion):
+        estatdisticas = EvaluationAdminRepository.socializarEmployeEvaluation(idEvaluacion)
+        if not estatdisticas:
+            return {}
+        
+        row = estatdisticas[0]
+        return{
+            
+        }

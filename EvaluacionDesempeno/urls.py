@@ -7,7 +7,8 @@ from EvaluacionDesempeno.views import (
     EvaluarEmpleadoView,
     EvaluacionCompletaView,
     MyListEvaluationsView,
-    EvaluacionIndicadorGestion
+    EvaluacionIndicadorGestion,
+    EvaluacionSocializacion
 )
 urlpatterns = [
     path('formato/<int:tipo>/', FormatoEvaluacionView.as_view(), name="evaluacion"),
@@ -18,5 +19,6 @@ urlpatterns = [
     path("evaluacion/<int:idEvaluacion>/", EvaluacionCompletaView.as_view(), name="evaluacionempleado"),
     path("my/evaluations/<str:idUsuario>/",MyListEvaluationsView.as_view(), name="myevaluations"),
     path("indicadores/",EvaluacionIndicadorGestion.as_view(), name="indicadoresevaluacion"),
+    path("list/empleado/evaluation/<str:userDocumento>/", EvaluacionSocializacion.as_view(), name="evaluacionesempleado"),
 ]
 
