@@ -209,4 +209,39 @@ class EvaluacionSocializacion(APIView):
                         "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                         "data":[]
                     })
-        
+
+class SocializarEvaluation(APIView):
+    def get(self, request, idEvaluacion):
+        try:
+            evaluaciones = EvaluationAdminService.getSocializacionEvaluacion(idEvaluacion)
+            return Response({
+                "message": "Evaluacion obtenida de manera correcta.",
+                "status": status.HTTP_200_OK,
+                "data":evaluaciones
+            })
+        except Exception as e:
+                    print(str(e))
+                    return Response({
+                        "message":"Ha ocurrido un error interno. Por favor, informe al soporte técnico.",
+                        "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        "data":[]
+                    })
+                    
+    def post(self, request):
+        try:
+            result = EvaluationAdminService.createSocializacion(request.data)
+            if "existe" in result:
+                return Response({
+                "message": "Esta socializacion no se puede hacer dos veces.",
+                "status": status.HTTP_200_OK
+            })
+            return Response({
+                "message": "Socializacion d ela evaluacion registrada de manera correcta.",
+                "status": status.HTTP_201_CREATED
+            })
+        except Exception as e:
+            print(str(e))
+            return Response({
+                "message":"Ha ocurrido un error interno. Por favor, informe al soporte técnico.",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+            })

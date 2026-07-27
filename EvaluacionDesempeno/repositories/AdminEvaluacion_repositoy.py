@@ -132,19 +132,20 @@ class EvaluationAdminRepository():
                         U.UserCode,
                         UJEF.Name,
                         UJEF.UserCode,
-                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,16,17,19,81,82) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Compromiso,
-                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (15,20,21,22,23,24,27,83) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado)/2.0 END) / 3.0 * 100 AS Conocimiento,
+                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,16,17,19,81,82) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) /3.0 * 100 AS Compromiso,
+                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (15,20,21,22,23,24,27,83) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Conocimiento,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (14,25,26) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Organizacion,
-                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (28,29,30,58,84,85,86,108) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado)/2.0 END) / 3.0 * 100 AS Normas,
-                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (31,32,33,34,35,36,87,88,89,90,91) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) /2.0 END) / 3.0 * 100 AS Liderazgo,
-                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (37,38,39,40,41,45,46,47,48,49,50,104,105,107,118) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) /2.0 END) / 3.0 * 100 AS Comunicacion,
+                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (28,29,30,58,84,85,86,108) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Normas,
+                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (31,32,33,34,35,36,87,88,89,90,91) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Liderazgo,
+                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (37,38,39,40,41,45,46,47,48,49,50,104,105,107,118) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Comunicacion,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (69,70,71,72,73,74) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Respeto,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (18,42,43,44,75,76,77,78,79,80) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Innovacion,
-                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (51,52,53,54,55,56,57,115,116,117,119) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS HSEQ,
+                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (51,52,53,54,55,56,57,115,116,117,119) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) /3.0 * 100 AS HSEQ,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (60,61,62,63,64,109,110,111,112,113,114) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS GestionHumana,
                         S.IdSoci,
                         SOCI.Name,
-                        S.ComproSoci
+                        SOCOM.IdCompromiso,
+                        SOCOM.comSocializacion
                     FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
                     INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
                     INNER JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF
@@ -153,7 +154,8 @@ class EvaluationAdminRepository():
                     INNER JOIN [Biometrico].[dbo].[Userinfo] U ON U.UserId = EMP.IdAutEvaEmpleado
                     INNER JOIN [Biometrico].[dbo].[Userinfo] UJEF ON UJEF.UserId = JEF.IdEvaEmpJefe
                     LEFT JOIN [Biometrico].[dbo].[TbSocializacionEvDesempeno] S ON S.IdEvaGenSoci = EVG.IdEvaGeneral
-                    LEFT JOIN [Biometrico].[dbo].[Userinfo] SOCI ON SOCI.UserId =  S.IdSocializador
+                    LEFT JOIN [Biometrico].[dbo].[Userinfo] SOCI ON SOCI.UserId = S.idSocializador
+                    LEFT JOIN [Biometrico].[dbo].[TbCompromisosSocializacion] SOCOM ON SOCOM.idSocializacion = S.IdSoci
                     WHERE EVG.IdEvaGeneral = %s
                     GROUP BY
                         EVG.IdEvaGeneral,
@@ -165,6 +167,48 @@ class EvaluationAdminRepository():
                         UJEF.UserCode,
                         S.IdSoci,
                         SOCI.Name,
-                        S.ComproSoci
-                """[idEvaluacion]) 
+                        SOCOM.IdCompromiso,
+                        SOCOM.comSocializacion
+                """,[idEvaluacion])
             return cursor.fetchall()
+    
+    @staticmethod
+    def existeSocializacion(idEvaGeneral):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                    SELECT EG.[IdEvaGeneral]
+                    FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EG
+                    INNER JOIN [Biometrico].[dbo].[TbSocializacionEvDesempeno] S ON S.IdEvaGenSoci = EG.IdEvaGeneral
+                    WHERE EG.[IdEvaGeneral] = %s
+                """, [idEvaGeneral]) 
+            row = cursor.fetchone()
+            
+            if row is None:
+                # No encontró al empleado o no cumple los requisitos
+                return False
+            else:
+                return True
+                
+    @staticmethod
+    def crearSocializacion(IdEvaluacion, IdSocializador):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                    INSERT INTO [Biometrico].[dbo].[TbSocializacionEvDesempeno]
+                    OUTPUT INSERTED.IdSoci
+                    VALUES(%s, %s, GETDATE())
+                """, [IdEvaluacion, IdSocializador])
+            row = cursor.fetchone()
+            
+            return row[0]
+        
+    @staticmethod    
+    def compromisoSocializacion(IdSocializacion, compromiso):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                    INSERT INTO [Biometrico].[dbo].[TbCompromisosSocializacion](idSocializacion,comSocializacion)
+                    VALUES(%s, %s)
+
+                """,[IdSocializacion, compromiso]) 

@@ -160,9 +160,73 @@ class EvaluationAdminService:
     
     @staticmethod
     def getSocializacionEvaluacion(idEvaluacion):
-        estatdisticas = EvaluationAdminRepository.socializarEmployeEvaluation(idEvaluacion)
-        if not estatdisticas:
+        filas = EvaluationAdminRepository.socializarEmployeEvaluation(idEvaluacion)
+        if not filas:
             return {}
-        
-        resultado = {}
+
+        primera = filas[0]
+
+        resultado = {
+            "idEvaluacion": primera[0],
+            "fechaEvaluacion": primera[1],
+            "idEmpleado": primera[2],
+            "nomEmpleado": primera[3],
+            "docEmpleado": primera[4],
+            "nomJefe": primera[5],
+            "docJefe": primera[6],
+            "compromiso": primera[7],
+            "conocimiento": primera[8],
+            "organizacion": primera[9],
+            "normas": primera[10],
+            "liderazgo": primera[11],
+            "comunicacion": primera[12],
+            "respeto": primera[13],
+            "innovacion": primera[14],
+            "hseq": primera[15],
+            "gestionHumana": primera[16],
+            "socializacion": {}
+        }
+
+        socializacion = None
+
+        for row in filas:
+
+            if row[17] is None:
+                continue
+
+            if socializacion is None:
+                socializacion = {
+                    "idSocializacion": row[17],
+                    "socializador": row[18],
+                    "compromisos": []
+                }
+
+            if row[19] is not None:
+                socializacion["compromisos"].append({
+                    "idCompromiso": row[19],
+                    "descripcion": row[20]
+                })
+
+        resultado["socializacion"] = socializacion
+
+        return resultado
     
+    @staticmethod
+    def createSocializacion(data):
+        IdEvaluacion = data["idEvaluacion"]
+        existe = EvaluationAdminRepository.existeSocializacion(IdEvaluacion)
+        if existe:
+            return {
+                "existe":"Ya existe una socializacion a esta evaluacion."
+            }
+        IdSocializador = data["IdSocializador"]   
+        IdSocializacion = (EvaluationAdminRepository.crearSocializacion(IdEvaluacion, IdSocializador))
+        
+        if not data["compromisos"]:
+            return
+        
+        for compromiso in data["compromisos"]:
+            EvaluationAdminRepository.compromisoSocializacion(
+                IdSocializacion=IdSocializacion,
+                compromiso=compromiso
+            )
