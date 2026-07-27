@@ -130,6 +130,7 @@ class EvaluationAdminRepository():
                         EMP.IdAutEvaEmpleado,
                         U.Name,
                         U.UserCode,
+                        CAR.NomCargo,
                         UJEF.Name,
                         UJEF.UserCode,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,16,17,19,81,82) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) /3.0 * 100 AS Compromiso,
@@ -145,17 +146,21 @@ class EvaluationAdminRepository():
                         S.IdSoci,
                         SOCI.Name,
                         SOCOM.IdCompromiso,
-                        SOCOM.comSocializacion
+                        SOCOM.comSocializacion,
+                        C.IdCompromiso,
+                        C.DescripcionCompromiso
                     FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
                     INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
                     INNER JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF
                         ON JEF.IdEmpleadoEvaluado = EMP.IdAutEvaEmpleado AND JEF.IdEvaIndGestion = EMP.IdEvaIndGestion
                     INNER JOIN [Biometrico].[dbo].[TbEvaluacionIndicadorGestion] ING ON ING.IdEvaIndicadorGestion = EMP.IdEvaIndGestion
                     INNER JOIN [Biometrico].[dbo].[Userinfo] U ON U.UserId = EMP.IdAutEvaEmpleado
+                    INNER JOIN [Biometrico].[dbo].[TbCargos] CAR ON CAR.IdCargo = U.IdCargo
                     INNER JOIN [Biometrico].[dbo].[Userinfo] UJEF ON UJEF.UserId = JEF.IdEvaEmpJefe
                     LEFT JOIN [Biometrico].[dbo].[TbSocializacionEvDesempeno] S ON S.IdEvaGenSoci = EVG.IdEvaGeneral
                     LEFT JOIN [Biometrico].[dbo].[Userinfo] SOCI ON SOCI.UserId = S.idSocializador
                     LEFT JOIN [Biometrico].[dbo].[TbCompromisosSocializacion] SOCOM ON SOCOM.idSocializacion = S.IdSoci
+                    LEFT JOIN [Biometrico].[dbo].[TbEvaluacionCompromisos] C ON C.IdEvaGen = EVG.IdEvaGeneral
                     WHERE EVG.IdEvaGeneral = %s
                     GROUP BY
                         EVG.IdEvaGeneral,
@@ -163,12 +168,15 @@ class EvaluationAdminRepository():
                         EMP.IdAutEvaEmpleado,
                         U.Name,
                         U.UserCode,
+                        CAR.NomCargo,
                         UJEF.Name,
                         UJEF.UserCode,
                         S.IdSoci,
                         SOCI.Name,
                         SOCOM.IdCompromiso,
-                        SOCOM.comSocializacion
+                        SOCOM.comSocializacion,
+                        C.IdCompromiso,
+                        C.DescripcionCompromiso
                 """,[idEvaluacion])
             return cursor.fetchall()
     

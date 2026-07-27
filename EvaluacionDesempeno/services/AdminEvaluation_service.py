@@ -172,42 +172,51 @@ class EvaluationAdminService:
             "idEmpleado": primera[2],
             "nomEmpleado": primera[3],
             "docEmpleado": primera[4],
-            "nomJefe": primera[5],
-            "docJefe": primera[6],
-            "compromiso": primera[7],
-            "conocimiento": primera[8],
-            "organizacion": primera[9],
-            "normas": primera[10],
-            "liderazgo": primera[11],
-            "comunicacion": primera[12],
-            "respeto": primera[13],
-            "innovacion": primera[14],
-            "hseq": primera[15],
-            "gestionHumana": primera[16],
-            "socializacion": {}
+            "cargo":primera[5],
+            "nomJefe": primera[6],
+            "docJefe": primera[7],
+            "compromiso": primera[8],
+            "conocimiento": primera[9],
+            "organizacion": primera[10],
+            "normas": primera[11],
+            "liderazgo": primera[12],
+            "comunicacion": primera[13],
+            "respeto": primera[14],
+            "innovacion": primera[15],
+            "hseq": primera[16],
+            "gestionHumana": primera[17],
+            "socializacion": {},
+            "compromisosJefes":[]
         }
 
         socializacion = None
-
         for row in filas:
-
             if row[17] is None:
                 continue
-
             if socializacion is None:
                 socializacion = {
-                    "idSocializacion": row[17],
-                    "socializador": row[18],
+                    "idSocializacion": row[18],
+                    "socializador": row[19],
                     "compromisos": []
                 }
-
             if row[19] is not None:
                 socializacion["compromisos"].append({
-                    "idCompromiso": row[19],
-                    "descripcion": row[20]
+                    "idCompromiso": row[20],
+                    "descripcion": row[21]
                 })
-
         resultado["socializacion"] = socializacion
+
+        compromisosJefes = resultado["compromisosJefes"]
+
+        for row in filas:
+            if row[22] is None:
+                continue
+
+            if not any(c["idCompromiso"] == row[22] for c in compromisosJefes):
+                compromisosJefes.append({
+                    "idCompromiso": row[22],
+                    "descripcion": row[23]
+                })
 
         return resultado
     
