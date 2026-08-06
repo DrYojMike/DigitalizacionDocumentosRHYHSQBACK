@@ -169,26 +169,62 @@ class EvaluationAdminService:
         resultado = {
             "idEvaluacion": primera[0],
             "fechaEvaluacion": primera[1],
+            "FechaSocializacion": primera[24],
             "idEmpleado": primera[2],
             "nomEmpleado": primera[3],
             "docEmpleado": primera[4],
             "cargo":primera[5],
-            "nomJefe": primera[6],
-            "docJefe": primera[7],
-            "compromiso": primera[8],
-            "conocimiento": primera[9],
-            "organizacion": primera[10],
-            "normas": primera[11],
-            "liderazgo": primera[12],
-            "comunicacion": primera[13],
-            "respeto": primera[14],
-            "innovacion": primera[15],
-            "hseq": primera[16],
-            "gestionHumana": primera[17],
+            "nomJefe": primera[7],
+            "docJefe": primera[6],
+            "cargoJefe":primera[26],
+            "idJefe":primera[25],
+            "Indicadores":[],
             "socializacion": {},
             "compromisosJefes":[]
         }
 
+        resultado["Indicadores"] = [
+            {
+                "nomber":"Compromiso",
+                "nota": primera[8]
+            },
+            {
+                "nomber":"Conocimiento",
+                "nota": primera[9]
+            },
+            {
+                "nomber":"Organización",
+                "nota": primera[10]
+            },
+            {
+                "nomber":"Normas",
+                "nota": primera[11]
+            },
+            {
+                "nombre": "Liderazgo",
+                "nota": primera[12]
+            },
+            {
+                "nombre": "Comunicación",
+                "nota": primera[13]
+            },
+            {
+                "nombre": "Respeto",
+                "nota": primera[14]
+            },
+            {
+                "nombre": "Innovación",
+                "nota": primera[15]
+            },
+            {
+                "nombre": "HSEQ",
+                "nota": primera[16]
+            },
+            {
+                "nombre": "Gestión Humana",
+                "nota": primera[17]
+            }
+        ]
         socializacion = None
         for row in filas:
             if row[17] is None:

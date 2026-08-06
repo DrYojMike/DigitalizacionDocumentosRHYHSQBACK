@@ -131,8 +131,8 @@ class EvaluationAdminRepository():
                         U.Name,
                         U.UserCode,
                         CAR.NomCargo,
-                        UJEF.Name,
                         UJEF.UserCode,
+                        UJEF.Name,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,16,17,19,81,82) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) /3.0 * 100 AS Compromiso,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (15,20,21,22,23,24,27,83) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Conocimiento,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (14,25,26) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Organizacion,
@@ -148,7 +148,12 @@ class EvaluationAdminRepository():
                         SOCOM.IdCompromiso,
                         SOCOM.comSocializacion,
                         C.IdCompromiso,
-                        C.DescripcionCompromiso
+                        C.DescripcionCompromiso,
+                        S.DateSocializacion,       
+                        UJEF.UserId,
+                        CAR2.NomCargo,
+                        UJEF.UserId,
+                        CAR2.NomCargo
                     FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
                     INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
                     INNER JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF
@@ -157,6 +162,7 @@ class EvaluationAdminRepository():
                     INNER JOIN [Biometrico].[dbo].[Userinfo] U ON U.UserId = EMP.IdAutEvaEmpleado
                     INNER JOIN [Biometrico].[dbo].[TbCargos] CAR ON CAR.IdCargo = U.IdCargo
                     INNER JOIN [Biometrico].[dbo].[Userinfo] UJEF ON UJEF.UserId = JEF.IdEvaEmpJefe
+                    INNER JOIN [Biometrico].[dbo].[TbCargos] CAR2 ON CAR2.IdCargo = UJEF.IdCargo
                     LEFT JOIN [Biometrico].[dbo].[TbSocializacionEvDesempeno] S ON S.IdEvaGenSoci = EVG.IdEvaGeneral
                     LEFT JOIN [Biometrico].[dbo].[Userinfo] SOCI ON SOCI.UserId = S.idSocializador
                     LEFT JOIN [Biometrico].[dbo].[TbCompromisosSocializacion] SOCOM ON SOCOM.idSocializacion = S.IdSoci
@@ -176,7 +182,10 @@ class EvaluationAdminRepository():
                         SOCOM.IdCompromiso,
                         SOCOM.comSocializacion,
                         C.IdCompromiso,
-                        C.DescripcionCompromiso
+                        C.DescripcionCompromiso,
+                        S.DateSocializacion,
+                        UJEF.UserId,
+                        CAR2.NomCargo
                 """,[idEvaluacion])
             return cursor.fetchall()
     
