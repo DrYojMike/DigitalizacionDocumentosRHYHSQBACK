@@ -32,7 +32,6 @@ class FormatoEvaluacionView(APIView):
                 "data":[]
             })
 
-
 class CreateEvaluationView(APIView):
     authentication_classes = [CustomJWTAuthentication]
     permission_classes = [IsCustomAuthenticated]
@@ -58,7 +57,6 @@ class CreateEvaluationView(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             })
 
-
 class ListaEmpleadoEvaluacionView(APIView):
     authentication_classes = [CustomJWTAuthentication]
     permission_classes = [IsCustomAuthenticated]
@@ -77,7 +75,6 @@ class ListaEmpleadoEvaluacionView(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "data":[]
             })
-
 
 class EvaluacionEmpleado(APIView):
     authentication_classes = [CustomJWTAuthentication]
@@ -104,7 +101,6 @@ class EvaluacionEmpleado(APIView):
                 "data":[]
             })
  
- 
 class EvaluarEmpleadoView(APIView):
     authentication_classes = [CustomJWTAuthentication]
     permission_classes = [IsCustomAuthenticated]
@@ -124,7 +120,6 @@ class EvaluarEmpleadoView(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "data":[]
             })            
-      
         
 class EvaluacionCompletaView(APIView): 
     authentication_classes = [CustomJWTAuthentication]
@@ -145,7 +140,6 @@ class EvaluacionCompletaView(APIView):
                 "data":{}
             })
 
-
 class MyListEvaluationsView(APIView): 
     authentication_classes = [CustomJWTAuthentication]
     permission_classes = [IsCustomAuthenticated]
@@ -164,34 +158,6 @@ class MyListEvaluationsView(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "data":[]
             })
-
-
-class EvaluacionIndicadorGestion(APIView):
-    authentication_classes = [CustomJWTAuthentication]
-    permission_classes = [IsCustomAuthenticated]
-    
-    def get(self, request):
-        try:
-            indicadorGestion = EvaluationAdminService.getIndicadorIndGestion()
-            inidcadorCompotencia = EvaluationAdminService.getIndicadorCompetencia()
-            indicadorAreas = EvaluationAdminService.getindicadorArea()
-            return Response({
-                "message": "Se han obtendido los indicadores de manera correcta.",
-                "status": status.HTTP_200_OK,
-                "data":{
-                    "indicadorGestion":indicadorGestion,
-                    "indicadorCompetencia": inidcadorCompotencia,
-                    "indicadorAreas": indicadorAreas
-                }
-            })
-        except Exception as e:
-            print(str(e))
-            return Response({
-                "message":"Ha ocurrido un error interno. Por favor, informe al soporte técnico.",
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "data":[]
-            })
-
 
 class EvaluacionSocializacion(APIView):
     def get(self, reques, userDocumento):

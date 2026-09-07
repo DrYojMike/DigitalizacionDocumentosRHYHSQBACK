@@ -23,5 +23,6 @@ urlpatterns = [
     # Refrescar token de acceso con refresh token
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path('api/auth/', include('users.urls')),
-    path('api/evaluacion/', include('EvaluacionDesempeno.urls'))
+    path('api/evaluacion/', include('EvaluacionDesempeno.urls')),
+    path('api/indicadores/', include('Indicators.urls')),
 ]
