@@ -226,8 +226,7 @@ class IndicatorsRepository():
                 INNER JOIN [Biometrico].[dbo].[TbEvaluacionIndicadorGestion] ING ON ING.IdEvaIndicadorGestion = EMP.IdEvaIndGestion;               
             """)
             return cursor.fetchall()
-            
-            
+                  
     @staticmethod
     def getIndicatorEvaluationType1():
         with connection.cursor() as cursor:
@@ -248,5 +247,151 @@ class IndicatorsRepository():
                 INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
                 INNER JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF ON JEF.IdEmpleadoEvaluado = EMP.IdAutEvaEmpleado AND JEF.IdEvaIndGestion = EMP.IdEvaIndGestion
                 INNER JOIN [Biometrico].[dbo].[TbEvaluacionIndicadorGestion] ING ON ING.IdEvaIndicadorGestion = EMP.IdEvaIndGestion;
+            """)
+            return cursor.fetchall()
+
+    @staticmethod
+    def getIndicadorSalary():
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                DECLARE @BRECHA_SALARIO DECIMAL(18,2) = 500000;
+                WITH SalarioMinimoLegal AS (
+                    SELECT
+                        2025 AS ANO,
+                        CAST(1423500 AS DECIMAL(18,2)) AS SALARIO_MINIMO
+                    UNION ALL
+                    SELECT
+                        2026,
+                        CAST(1750905 AS DECIMAL(18,2))
+                ),
+                SalariosMensuales AS (
+                    SELECT
+                        DATEFROMPARTS(YEAR(FECHA), MONTH(FECHA), 1) AS MES,
+                        YEAR(FECHA) AS ANO,
+                        NOM,
+                        SUM(VALOR) AS SALARIO_MENSUAL
+                    FROM [EMP002_NOM].[dbo].[NOM_ACUM]
+                    WHERE FECHA >= DATEADD(MONTH, -12, CAST(GETDATE() AS DATE))
+                    AND FECHA < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
+                    AND TIPO IN ('01', '15')
+                    GROUP BY
+                        DATEFROMPARTS(YEAR(FECHA), MONTH(FECHA), 1),
+                        YEAR(FECHA),
+                        NOM
+                ),
+
+                SalariosValidos AS (
+                    SELECT
+                        S.MES,
+                        S.ANO,
+                        S.NOM,
+                        S.SALARIO_MENSUAL,
+                        SM.SALARIO_MINIMO AS SALARIO_MINIMO_LEGAL
+                    FROM SalariosMensuales S
+                    INNER JOIN SalarioMinimoLegal SM
+                        ON SM.ANO = S.ANO
+                    WHERE S.SALARIO_MENSUAL >= SM.SALARIO_MINIMO
+                ),
+
+                ResumenMensual AS (
+                    SELECT
+                        MES,
+
+                        SALARIO_MINIMO_LEGAL,
+
+                        MIN(SALARIO_MENSUAL) AS SALARIO_MINIMO,
+
+                        MAX(SALARIO_MENSUAL) AS SALARIO_MAXIMO,
+
+                        AVG(
+                            CAST(SALARIO_MENSUAL AS DECIMAL(18,2))
+                        ) AS SALARIO_PROMEDIO,
+
+                        COUNT(*) AS TOTAL_PERSONAL
+
+                    FROM SalariosValidos
+
+                    GROUP BY
+                        MES,
+                        SALARIO_MINIMO_LEGAL
+                ),
+
+                ClasificacionPersonal AS (
+                    SELECT
+                        S.MES,
+                        S.NOM,
+                        S.SALARIO_MENSUAL,
+
+                        CASE
+                            WHEN S.SALARIO_MENSUAL = R.SALARIO_MINIMO
+                                THEN 'MINIMO'
+
+                            WHEN S.SALARIO_MENSUAL = R.SALARIO_MAXIMO
+                                THEN 'MAXIMO'
+
+                            WHEN S.SALARIO_MENSUAL BETWEEN
+                                    R.SALARIO_PROMEDIO - @BRECHA_SALARIO
+                                    AND
+                                    R.SALARIO_PROMEDIO + @BRECHA_SALARIO
+                                THEN 'PROMEDIO'
+
+                            ELSE 'OTROS'
+                        END AS CATEGORIA
+
+                    FROM SalariosValidos S
+
+                    INNER JOIN ResumenMensual R
+                        ON R.MES = S.MES
+                )
+
+                SELECT
+                    R.MES,
+
+                    R.SALARIO_MINIMO,
+
+                    SUM(
+                        CASE
+                            WHEN C.CATEGORIA = 'MINIMO' THEN 1
+                            ELSE 0
+                        END
+                    ) AS PERSONAL_MINIMO,
+
+                    R.SALARIO_MAXIMO,
+
+                    SUM(
+                        CASE
+                            WHEN C.CATEGORIA = 'MAXIMO' THEN 1
+                            ELSE 0
+                        END
+                    ) AS PERSONAL_MAXIMO,
+
+                    R.SALARIO_PROMEDIO,
+
+                    SUM(
+                        CASE
+                            WHEN C.CATEGORIA = 'PROMEDIO' THEN 1
+                            ELSE 0
+                        END
+                    ) AS PERSONAL_PROMEDIO,
+
+                    R.TOTAL_PERSONAL,
+                    SUM(
+                        CASE
+                            WHEN C.CATEGORIA = 'OTROS' THEN 1
+                            ELSE 0
+                        END
+                    ) AS PERSONAL_OTROS
+                FROM ResumenMensual R
+                LEFT JOIN ClasificacionPersonal C ON C.MES = R.MES
+
+                GROUP BY
+                    R.MES,
+                    R.SALARIO_MINIMO,
+                    R.SALARIO_MAXIMO,
+                    R.SALARIO_PROMEDIO,
+                    R.TOTAL_PERSONAL
+
+                ORDER BY
+                    R.MES ASC
             """)
             return cursor.fetchall()

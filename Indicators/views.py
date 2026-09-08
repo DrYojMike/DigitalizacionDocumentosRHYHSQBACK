@@ -58,3 +58,21 @@ class IndicatorGeneralEvalationView(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "data":[]
             })
+
+
+class IndicatorSalaryView(APIView):
+    def get(self, request):
+        try:
+            data = IndicatorsService.getIndicadorSalary()
+            return Response({
+                "message":"Indicador de Salario obtenido con exito.",
+                "status": status.HTTP_200_OK,
+                "data":data
+            })
+        except Exception as e:
+            print(str(e))
+            return Response({
+                "message":"Ha ocurrido un error interno. Por favor, informe al soporte técnico.",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "data":[]
+            })

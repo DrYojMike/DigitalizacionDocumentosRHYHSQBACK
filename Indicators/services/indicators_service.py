@@ -135,3 +135,27 @@ class IndicatorsService():
                 "creatividadEIniciativa": tipo2[9],
             },
         }
+
+    @staticmethod
+    def getIndicadorSalary():
+        data = IndicatorsRepository.getIndicadorSalary()
+        
+        if not data:
+            return None
+        
+        response = []
+        
+        for row in data:
+            response.append({
+                "Anio": row[0],
+                "Minimo": row[1],
+                "PersonalMinimo": row[2],
+                "Maximo": row[3],
+                "PersonalMaximo": row[4],
+                "Promedio": row[5],
+                "PersonalPromedio": row[6],
+                "TotalPersonal": row[7],
+                "PersonalNoEnPromedio": row[8]
+            })
+            
+        return response
