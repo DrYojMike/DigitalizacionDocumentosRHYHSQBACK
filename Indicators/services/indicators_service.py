@@ -79,3 +79,59 @@ class IndicatorsService():
             response.append(area)
 
         return response
+
+    @staticmethod
+    def getIndicadorEvaluation():
+
+        evaluation_general = IndicatorsRepository.getIndicatorEvaluationGeneral()
+        evaluation_type1 = IndicatorsRepository.getIndicatorEvaluationType1()
+        evaluation_type2 = IndicatorsRepository.getIndicatorEvaluationType2()
+
+        general = evaluation_general[0] if evaluation_general else []
+        tipo1 = evaluation_type1[0] if evaluation_type1 else []
+        tipo2 = evaluation_type2[0] if evaluation_type2 else []
+
+        return {
+            "general": {
+                "eficienciaEnElTrabajo": general[0],
+                "conocimientosTecnicos": general[1],
+                "destrezaEnLaRealizacionDelTrabajo": general[2],
+                "cumplimientoDeNormasYProcedimientos": general[3],
+                "compromisoOrganizacional": general[4],
+                "supervision": general[5],
+                "tomaDeDecisiones": general[6],
+                "trabajoEnEquipo": general[7],
+                "direccionamientoEstrategico": general[8],
+                "participacionYCapacitacion": general[9],
+                "desarrolloDeLasActividades": general[10],
+                "relacionesInterpersonales": general[11],
+                "creatividadEIniciativa": general[12],
+            },
+
+            "tipo1": {
+                "eficienciaEnElTrabajo": tipo1[0],
+                "conocimientosTecnicos": tipo1[1],
+                "destrezaEnLaRealizacionDelTrabajo": tipo1[2],
+                "cumplimientoDeNormasYProcedimientos": tipo1[3],
+                "compromisoOrganizacional": tipo1[4],
+                "supervision": tipo1[5],
+                "tomaDeDecisiones": tipo1[6],
+                "trabajoEnEquipo": tipo1[7],
+                "direccionamientoEstrategico": tipo1[8],
+                "participacionYCapacitacion": tipo1[9],
+                "desarrolloDeLasActividades": tipo1[10],
+            },
+
+            "tipo2": {
+                "eficienciaEnElTrabajo": tipo2[0],
+                "conocimientosTecnicos": tipo2[1],
+                "destrezaEnLaRealizacionDelTrabajo": tipo2[2],
+                "cumplimientoDeNormasYProcedimientos": tipo2[3],
+                "compromisoOrganizacional": tipo2[4],
+                "direccionamientoEstrategico": tipo2[5],
+                "participacionYCapacitacion": tipo2[6],
+                "desarrolloDeLasActividades": tipo2[7],
+                "relacionesInterpersonales": tipo2[8],
+                "creatividadEIniciativa": tipo2[9],
+            },
+        }

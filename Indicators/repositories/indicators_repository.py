@@ -179,3 +179,74 @@ class IndicatorsRepository():
             )
             
             return cursor.fetchall()
+    
+    @staticmethod
+    def getIndicatorEvaluationGeneral():
+        with connection.cursor() as cursor:
+            cursor.execute("""           
+                SELECT
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,16,19,82) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Eficiencia En El Trabajo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (20,21,22,23,24,27,83) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Conocimientos Tecnicos',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (14,25,26,39,59,61,62,63) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END ) / 3.0 * 100 AS 'Destreza En La Realizacion Del Trabajo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (28,29,30,40,51,52,58,84,85,86,108,115,116) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Cumplimiento De Normas Y Procedimientos',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (43,44,87,88,89,90,91) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Compromiso Organizacional',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (31,32,33,34,35,37,38,46,47,104,105,107,118) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60)END) / 3.0 * 100 AS 'Supervision',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (17,42,76) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Toma De Decisiones',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (45,50,81) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Trabajo En Equipo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (53,54,55,60,110,117) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Direccionamiento Estrategico',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (56,57,79) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Participacion Y Capacitacion',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (18,48,57,75,80,109,111,112,113,114,119) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Desarrollo De Las Actividades',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (41,48,49,69,70,71,72,73,74) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Relaciones Interpersonales',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (18,42,43,75,77,78) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Creatividad E Iniciativa'
+                FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
+                INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
+                INNER JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF ON JEF.IdEmpleadoEvaluado = EMP.IdAutEvaEmpleado AND JEF.IdEvaIndGestion = EMP.IdEvaIndGestion
+                INNER JOIN [Biometrico].[dbo].[TbEvaluacionIndicadorGestion] ING ON ING.IdEvaIndicadorGestion = EMP.IdEvaIndGestion;
+            """)
+            return cursor.fetchall()
+            
+    @staticmethod
+    def getIndicatorEvaluationType2():
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,16,19,82) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Eficiencia En El Trabajo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (20,21,22,23,24,27,83) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Conocimientos Tecnicos',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (14,25,26,39,59,61,62,63) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END ) / 3.0 * 100 AS 'Destreza En La Realizacion Del Trabajo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (28,29,30,40,51,52,58,84,85,86,108,115,116) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Cumplimiento De Normas Y Procedimientos',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (43,44,87,88,89,90,91) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Compromiso Organizacional',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (53,54,55,60,110,117) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Direccionamiento Estrategico',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (56,57,79) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Participacion Y Capacitacion',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (18,48,57,75,80,109,111,112,113,114,119) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Desarrollo De Las Actividades',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (41,48,49,69,70,71,72,73,74) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Relaciones Interpersonales',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (18,42,43,75,77,78) AND ING.ForEvaIndicadorGestion IN (0,2) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Creatividad E Iniciativa'
+                FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
+                INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
+                INNER JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF ON JEF.IdEmpleadoEvaluado = EMP.IdAutEvaEmpleado AND JEF.IdEvaIndGestion = EMP.IdEvaIndGestion
+                INNER JOIN [Biometrico].[dbo].[TbEvaluacionIndicadorGestion] ING ON ING.IdEvaIndicadorGestion = EMP.IdEvaIndGestion;               
+            """)
+            return cursor.fetchall()
+            
+            
+    @staticmethod
+    def getIndicatorEvaluationType1():
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,16,19,82) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Eficiencia En El Trabajo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (20,21,22,23,24,27,83) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Conocimientos Tecnicos',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (14,25,26,39,59,61,62,63) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END ) / 3.0 * 100 AS 'Destreza En La Realizacion Del Trabajo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (28,29,30,40,51,52,58,84,85,86,108,115,116) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Cumplimiento De Normas Y Procedimientos',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (43,44,87,88,89,90,91) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Compromiso Organizacional',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (31,32,33,34,35,37,38,46,47,104,105,107,118) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60)END) / 3.0 * 100 AS 'Supervision',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (17,42,76) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Toma De Decisiones',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (45,50,81) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Trabajo En Equipo',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (53,54,55,60,110,117) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Direccionamiento Estrategico',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (56,57,79) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Participacion Y Capacitacion',
+                    AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (18,48,57,75,80,109,111,112,113,114,119) AND ING.ForEvaIndicadorGestion IN (0,1) THEN (EMP.NotAutEvaEmpleado * 0.40) + (JEF.NotEvaAEmpleado * 0.60) END) / 3.0 * 100 AS 'Desarrollo De Las Actividades'
+                FROM [Biometrico].[dbo].[TbEvaluacionGeneral] EVG
+                INNER JOIN [Biometrico].[dbo].[TbAutoEvaluacionEmpleado] EMP ON EMP.IdEvaGen = EVG.IdEvaGeneral
+                INNER JOIN [Biometrico].[dbo].[TbEvaluacionAEmpleado] JEF ON JEF.IdEmpleadoEvaluado = EMP.IdAutEvaEmpleado AND JEF.IdEvaIndGestion = EMP.IdEvaIndGestion
+                INNER JOIN [Biometrico].[dbo].[TbEvaluacionIndicadorGestion] ING ON ING.IdEvaIndicadorGestion = EMP.IdEvaIndGestion;
+            """)
+            return cursor.fetchall()

@@ -40,3 +40,21 @@ class PerformaneEvaluationView(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "data":[]
             })
+            
+
+class IndicatorGeneralEvalationView(APIView):
+    def get(self, request):
+        try:
+            data = IndicatorsService.getIndicadorEvaluation()
+            return Response({
+                "message":"Indicador de Evaluacion de desempeño obtenido con exito.",
+                "status": status.HTTP_200_OK,
+                "data":data
+            })
+        except Exception as e:
+            print(str(e))
+            return Response({
+                "message":"Ha ocurrido un error interno. Por favor, informe al soporte técnico.",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "data":[]
+            })
