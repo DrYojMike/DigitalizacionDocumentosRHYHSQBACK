@@ -59,7 +59,7 @@ class EvaluationAdminRepository():
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (28,29,30,58,84,85,86,108) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Normas,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (31,32,33,34,35,36,87,88,89,90,91) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Liderazgo,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (37,38,39,40,41,45,46,47,48,49,50,104,105,107,118) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Comunicacion,
-                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (69,70,71,72,73,74) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Respeto,
+                        AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (13,69,70,71,72,73,74,15,17,29,30,34,56) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Respeto,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (18,42,43,44,75,76,77,78,79,80) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS Innovacion,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (51,52,53,54,55,56,57,115,116,117,119) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) /3.0 * 100 AS HSEQ,
                         AVG(CASE WHEN ING.IdEvaIndicadorGestion IN (60,61,62,63,64,109,110,111,112,113,114) THEN (EMP.NotAutEvaEmpleado + JEF.NotEvaAEmpleado) / 2.0 END) / 3.0 * 100 AS GestionHumana,

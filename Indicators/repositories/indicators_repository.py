@@ -259,11 +259,20 @@ class IndicatorsRepository():
                     SELECT
                         2025 AS ANO,
                         CAST(1423500 AS DECIMAL(18,2)) AS SALARIO_MINIMO
+
                     UNION ALL
+
                     SELECT
-                        2026,
-                        CAST(1750905 AS DECIMAL(18,2))
+                        2026 AS ANO,
+                        CAST(1750905 AS DECIMAL(18,2)) AS SALARIO_MINIMO
                 ),
+
+                /*
+                    Obtiene el salario base mensual de cada empleado.
+
+                    TIPO 01 = SUELDOS
+                    TIPO 15 = SALARIO INTEGRAL
+                */
                 SalariosMensuales AS (
                     SELECT
                         DATEFROMPARTS(YEAR(FECHA), MONTH(FECHA), 1) AS MES,
@@ -271,8 +280,16 @@ class IndicatorsRepository():
                         NOM,
                         SUM(VALOR) AS SALARIO_MENSUAL
                     FROM [EMP002_NOM].[dbo].[NOM_ACUM]
-                    WHERE FECHA >= DATEADD(MONTH, -12, CAST(GETDATE() AS DATE))
-                    AND FECHA < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
+                    WHERE FECHA >= DATEADD(
+                            MONTH,
+                            -12,
+                            DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1)
+                        )
+                    AND FECHA < DATEFROMPARTS(
+                            YEAR(GETDATE()),
+                            MONTH(GETDATE()),
+                            1
+                        )
                     AND TIPO IN ('01', '15')
                     GROUP BY
                         DATEFROMPARTS(YEAR(FECHA), MONTH(FECHA), 1),
@@ -280,7 +297,11 @@ class IndicatorsRepository():
                         NOM
                 ),
 
-                SalariosValidos AS (
+                /*
+                    Asigna a cada empleado el salario mínimo legal
+                    correspondiente al año.
+                */
+                SalariosConMinimo AS (
                     SELECT
                         S.MES,
                         S.ANO,
@@ -290,16 +311,20 @@ class IndicatorsRepository():
                     FROM SalariosMensuales S
                     INNER JOIN SalarioMinimoLegal SM
                         ON SM.ANO = S.ANO
-                    WHERE S.SALARIO_MENSUAL >= SM.SALARIO_MINIMO
                 ),
 
+                /*
+                    Resumen mensual.
+
+                    IMPORTANTE:
+                    SALARIO_MINIMO ahora es el salario mínimo legal,
+                    NO el menor salario encontrado en nómina.
+                */
                 ResumenMensual AS (
                     SELECT
                         MES,
 
                         SALARIO_MINIMO_LEGAL,
-
-                        MIN(SALARIO_MENSUAL) AS SALARIO_MINIMO,
 
                         MAX(SALARIO_MENSUAL) AS SALARIO_MAXIMO,
 
@@ -307,15 +332,18 @@ class IndicatorsRepository():
                             CAST(SALARIO_MENSUAL AS DECIMAL(18,2))
                         ) AS SALARIO_PROMEDIO,
 
-                        COUNT(*) AS TOTAL_PERSONAL
+                        COUNT(DISTINCT NOM) AS TOTAL_PERSONAL
 
-                    FROM SalariosValidos
+                    FROM SalariosConMinimo
 
                     GROUP BY
                         MES,
                         SALARIO_MINIMO_LEGAL
                 ),
 
+                /*
+                    Clasificación del personal.
+                */
                 ClasificacionPersonal AS (
                     SELECT
                         S.MES,
@@ -323,12 +351,23 @@ class IndicatorsRepository():
                         S.SALARIO_MENSUAL,
 
                         CASE
-                            WHEN S.SALARIO_MENSUAL = R.SALARIO_MINIMO
+                            /*
+                                Si recibió menos del mínimo debido a ingreso,
+                                retiro o periodo incompleto, se considera
+                                dentro de MINIMO.
+                            */
+                            WHEN S.SALARIO_MENSUAL <= S.SALARIO_MINIMO_LEGAL
                                 THEN 'MINIMO'
 
+                            /*
+                                Salario máximo real del mes.
+                            */
                             WHEN S.SALARIO_MENSUAL = R.SALARIO_MAXIMO
                                 THEN 'MAXIMO'
 
+                            /*
+                                Personas dentro de +/- $500.000 del promedio.
+                            */
                             WHEN S.SALARIO_MENSUAL BETWEEN
                                     R.SALARIO_PROMEDIO - @BRECHA_SALARIO
                                     AND
@@ -338,7 +377,7 @@ class IndicatorsRepository():
                             ELSE 'OTROS'
                         END AS CATEGORIA
 
-                    FROM SalariosValidos S
+                    FROM SalariosConMinimo S
 
                     INNER JOIN ResumenMensual R
                         ON R.MES = S.MES
@@ -347,11 +386,19 @@ class IndicatorsRepository():
                 SELECT
                     R.MES,
 
-                    R.SALARIO_MINIMO,
+                    /*
+                        Salario mínimo LEGAL vigente para ese año.
+                    */
+                    R.SALARIO_MINIMO_LEGAL AS SALARIO_MINIMO,
 
+                    /*
+                        Cantidad de personas con salario
+                        igual o inferior al mínimo legal.
+                    */
                     SUM(
                         CASE
-                            WHEN C.CATEGORIA = 'MINIMO' THEN 1
+                            WHEN C.CATEGORIA = 'MINIMO'
+                                THEN 1
                             ELSE 0
                         END
                     ) AS PERSONAL_MINIMO,
@@ -360,7 +407,8 @@ class IndicatorsRepository():
 
                     SUM(
                         CASE
-                            WHEN C.CATEGORIA = 'MAXIMO' THEN 1
+                            WHEN C.CATEGORIA = 'MAXIMO'
+                                THEN 1
                             ELSE 0
                         END
                     ) AS PERSONAL_MAXIMO,
@@ -369,29 +417,35 @@ class IndicatorsRepository():
 
                     SUM(
                         CASE
-                            WHEN C.CATEGORIA = 'PROMEDIO' THEN 1
+                            WHEN C.CATEGORIA = 'PROMEDIO'
+                                THEN 1
                             ELSE 0
                         END
                     ) AS PERSONAL_PROMEDIO,
 
                     R.TOTAL_PERSONAL,
+
                     SUM(
                         CASE
-                            WHEN C.CATEGORIA = 'OTROS' THEN 1
+                            WHEN C.CATEGORIA = 'OTROS'
+                                THEN 1
                             ELSE 0
                         END
                     ) AS PERSONAL_OTROS
+
                 FROM ResumenMensual R
-                LEFT JOIN ClasificacionPersonal C ON C.MES = R.MES
+
+                LEFT JOIN ClasificacionPersonal C
+                    ON C.MES = R.MES
 
                 GROUP BY
                     R.MES,
-                    R.SALARIO_MINIMO,
+                    R.SALARIO_MINIMO_LEGAL,
                     R.SALARIO_MAXIMO,
                     R.SALARIO_PROMEDIO,
                     R.TOTAL_PERSONAL
 
                 ORDER BY
-                    R.MES ASC
+                    R.MES ASC;
             """)
             return cursor.fetchall()
